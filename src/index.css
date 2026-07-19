@@ -1,0 +1,75 @@
+:root {
+  /* Color tokens — grounded in dhol-tasha pathak festival colours */
+  --maroon-deep: #6b1420;
+  --maroon-dark: #4a0e17;
+  --maroon-mid: #8a1f2d;
+  --saffron: #e8a33d;
+  --saffron-light: #f2c169;
+  --cream: #fbf3e7;
+  --offwhite: #f7f6f3;
+  --cream-panel: #ffffff;
+  --ink: #2b1810;
+  --ink-soft: #6b5a4f;
+  --border: #e8dcc9;
+
+  --present: #2e7d4f;
+  --present-dark: #23603c;
+  --absent: #c0392b;
+  --absent-dark: #9c2d21;
+  --seva: #c98a12;
+  --seva-dark: #a06f0e;
+
+  --font-display: "Baloo 2", "Segoe UI", sans-serif;
+  --font-body: "Work Sans", "Segoe UI", sans-serif;
+
+  --shadow-soft: 0 4px 16px rgba(74, 14, 23, 0.08);
+  --shadow-med: 0 8px 28px rgba(74, 14, 23, 0.14);
+  --radius: 14px;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+#root {
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-body);
+  background: var(--cream);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  margin: 0;
+  color: var(--maroon-dark);
+}
+
+button {
+  font-family: var(--font-body);
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+}
+
+::selection {
+  background: var(--saffron-light);
+}
+
+/* Decorative dhol-rim pattern used behind headers */
+.rim-pattern {
+  background-image: radial-gradient(var(--saffron) 1.5px, transparent 1.5px);
+  background-size: 14px 14px;
+  opacity: 0.35;
+}

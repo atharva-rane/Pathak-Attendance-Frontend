@@ -1,0 +1,268 @@
+.attendance-page {
+  min-height: 100vh;
+  background: var(--offwhite);
+  padding-bottom: 60px;
+}
+
+.attendance-main {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 32px 24px 0;
+}
+
+.vadan-section {
+  margin-bottom: 48px;
+  padding-bottom: 8px;
+}
+
+.vadan-section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding: 10px 16px;
+  border-radius: 10px;
+  background: linear-gradient(90deg, var(--maroon-deep) 0%, var(--maroon-mid) 100%);
+}
+
+.vadan-section-tasha .vadan-section-header {
+  background: linear-gradient(90deg, #a9711f 0%, var(--saffron) 100%);
+}
+
+.vadan-section-header h3 {
+  font-size: 20px;
+  color: white;
+}
+
+.vadan-count {
+  font-size: 12.5px;
+  color: rgba(255, 255, 255, 0.85);
+  font-weight: 600;
+  background: rgba(255, 255, 255, 0.18);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.toolbar-add-btn {
+  background: var(--maroon-deep);
+  color: white;
+  border: none;
+  padding: 11px 20px;
+  border-radius: 10px;
+  font-weight: 600;
+  font-size: 14px;
+  box-shadow: var(--shadow-soft);
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.toolbar-add-btn:hover {
+  background: var(--maroon-mid);
+  transform: translateY(-1px);
+}
+
+.toolbar-date {
+  font-size: 13px;
+  color: var(--ink-soft);
+  font-weight: 600;
+  background: white;
+  border: 1.5px solid var(--border);
+  padding: 8px 14px;
+  border-radius: 8px;
+}
+
+.search-bar {
+  margin-bottom: 18px;
+}
+
+.search-bar input {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  font-size: 14px;
+  font-family: var(--font-body);
+  outline: none;
+  background: white;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.search-bar input:focus {
+  border-color: var(--saffron);
+  box-shadow: 0 0 0 3px rgba(232, 163, 61, 0.18);
+}
+
+/* --- Grid ------------------------------------------------------- */
+
+.attendance-grid-wrapper {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid rgba(43, 24, 16, 0.14);
+
+  --ag-font-family: var(--font-body);
+  --ag-background-color: #ffffff;
+  --ag-header-background-color: #eef0f2;
+  --ag-header-foreground-color: #2b1810;
+  --ag-odd-row-background-color: #fafafa;
+  --ag-border-color: rgba(43, 24, 16, 0.16);
+  --ag-row-border-color: rgba(43, 24, 16, 0.1);
+  --ag-row-hover-color: #fbeedb;
+  --ag-font-size: 13.5px;
+  --ag-header-height: 46px;
+  --ag-row-height: 50px;
+}
+
+/* Mild dark grey vertical borders between every cell and header */
+.attendance-grid-wrapper .ag-cell {
+  border-right: 1px solid rgba(43, 24, 16, 0.14);
+  display: flex;
+  align-items: center;
+}
+
+.attendance-grid-wrapper .ag-header-cell,
+.attendance-grid-wrapper .ag-header-group-cell {
+  border-right: 1px solid rgba(43, 24, 16, 0.22);
+}
+
+.attendance-grid-wrapper .ag-header-cell-label {
+  font-weight: 700;
+  letter-spacing: 0.2px;
+}
+
+/* Center all header labels */
+.header-center .ag-header-cell-label {
+  justify-content: center;
+}
+
+/* Center cell content by default */
+.cell-center {
+  justify-content: center;
+  text-align: center;
+}
+
+/* Full Name column: header stays centered (via header-center),
+   but the data itself is left aligned */
+.cell-left {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+/* --- Attendance mark buttons ------------------------------------ */
+
+.attendance-btns {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+  height: 100%;
+}
+
+.att-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  color: white;
+  font-weight: 700;
+  font-size: 12px;
+  opacity: 0.6;
+  box-shadow: 0 1px 3px rgba(43, 24, 16, 0.25);
+  transition: opacity 0.15s ease, transform 0.1s ease, box-shadow 0.15s ease;
+}
+
+.att-btn:hover {
+  opacity: 0.9;
+  transform: scale(1.1);
+}
+
+.att-btn.active {
+  opacity: 1;
+  border-color: var(--ink);
+  box-shadow: 0 0 0 3px rgba(43, 24, 16, 0.1), 0 1px 3px rgba(43, 24, 16, 0.3);
+}
+
+.att-btn.present {
+  background: var(--present);
+}
+
+.att-btn.absent {
+  background: var(--absent);
+}
+
+.att-btn.seva {
+  background: var(--seva);
+}
+
+.icon-btn {
+  background: transparent;
+  border: 1.5px solid var(--border);
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ink);
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.icon-btn:hover {
+  background: var(--cream);
+  border-color: var(--saffron);
+}
+
+.icon-btn-danger:hover {
+  background: #fdecea;
+  border-color: var(--absent);
+  color: var(--absent-dark);
+}
+
+/* --- Export & toast ---------------------------------------------- */
+
+.export-row {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 24px;
+}
+
+.export-btn {
+  background: var(--saffron);
+  color: var(--maroon-dark);
+  border: none;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  box-shadow: var(--shadow-soft);
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.export-btn:hover {
+  background: var(--saffron-light);
+  transform: translateY(-1px);
+}
+
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--maroon-dark);
+  color: white;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  box-shadow: var(--shadow-med);
+  z-index: 200;
+}

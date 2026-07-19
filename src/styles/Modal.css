@@ -1,0 +1,137 @@
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(43, 24, 16, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 16px;
+}
+
+.modal-card {
+  background: white;
+  border-radius: 16px;
+  padding: 28px 28px 24px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: var(--shadow-med);
+}
+
+.modal-card-small {
+  max-width: 380px;
+}
+
+.modal-card h3 {
+  font-size: 20px;
+  margin-bottom: 18px;
+}
+
+.modal-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.modal-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.modal-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.modal-form input,
+.modal-form select {
+  padding: 10px 12px;
+  border-radius: 9px;
+  border: 1.5px solid var(--border);
+  font-size: 14px;
+  font-family: var(--font-body);
+  outline: none;
+  color: var(--ink);
+  background: white;
+}
+
+.modal-form input:focus,
+.modal-form select:focus {
+  border-color: var(--saffron);
+}
+
+.modal-error {
+  background: #fdecea;
+  color: var(--absent-dark);
+  padding: 9px 11px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.modal-confirm-text {
+  font-size: 14px;
+  color: var(--ink-soft);
+  line-height: 1.6;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 6px;
+}
+
+.modal-btn-secondary,
+.modal-btn-primary,
+.modal-btn-danger {
+  padding: 10px 18px;
+  border-radius: 9px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+}
+
+.modal-btn-secondary {
+  background: var(--cream);
+  color: var(--ink);
+  border: 1.5px solid var(--border);
+}
+
+.modal-btn-secondary:hover {
+  background: #f2e8d8;
+}
+
+.modal-btn-primary {
+  background: var(--maroon-deep);
+  color: white;
+}
+
+.modal-btn-primary:hover:not(:disabled) {
+  background: var(--maroon-mid);
+}
+
+.modal-btn-danger {
+  background: var(--absent);
+  color: white;
+}
+
+.modal-btn-danger:hover:not(:disabled) {
+  background: var(--absent-dark);
+}
+
+.modal-btn-primary:disabled,
+.modal-btn-danger:disabled {
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .modal-row {
+    grid-template-columns: 1fr;
+  }
+}
