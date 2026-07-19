@@ -1,0 +1,147 @@
+.date-select-page {
+  min-height: 100vh;
+  background: var(--offwhite);
+  padding-bottom: 60px;
+}
+
+.date-select-main {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 32px 24px 0;
+}
+
+.date-picker-card,
+.practiced-dates-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-soft);
+  padding: 24px;
+  margin-bottom: 24px;
+}
+
+.date-picker-card h3,
+.practiced-dates-card h3 {
+  font-size: 18px;
+}
+
+.date-picker-sub {
+  color: var(--ink-soft);
+  font-size: 13.5px;
+  margin: 8px 0 18px;
+}
+
+.date-picker-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.date-picker-row input[type="date"] {
+  flex: 1;
+  min-width: 180px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1.5px solid var(--border);
+  font-size: 14px;
+  font-family: var(--font-body);
+  color: var(--ink);
+  background: white;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.date-picker-row input[type="date"]:focus {
+  border-color: var(--saffron);
+  box-shadow: 0 0 0 3px rgba(232, 163, 61, 0.18);
+}
+
+.date-picker-go-btn {
+  background: var(--maroon-deep);
+  color: white;
+  border: none;
+  padding: 12px 22px;
+  border-radius: 10px;
+  font-weight: 700;
+  font-size: 14px;
+  white-space: nowrap;
+  box-shadow: var(--shadow-soft);
+  transition: background 0.15s ease, transform 0.1s ease;
+}
+
+.date-picker-go-btn:hover {
+  background: var(--maroon-mid);
+  transform: translateY(-1px);
+}
+
+.date-picker-go-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.practiced-dates-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 4px;
+}
+
+.practiced-dates-count {
+  font-size: 12.5px;
+  color: var(--ink-soft);
+  font-weight: 600;
+  background: var(--cream);
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.date-select-empty {
+  padding: 24px 8px;
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 14px;
+}
+
+.practiced-dates-grid {
+  margin-top: 14px;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.practiced-date-chip {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  text-align: left;
+  background: var(--cream);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  padding: 12px 14px;
+  transition: border-color 0.15s ease, transform 0.1s ease, background 0.15s ease;
+}
+
+.practiced-date-chip:hover {
+  border-color: var(--saffron);
+  transform: translateY(-2px);
+  background: white;
+}
+
+.practiced-date-chip.is-today {
+  border-color: var(--maroon-deep);
+  background: #fdf1e4;
+}
+
+.practiced-date-main {
+  font-weight: 700;
+  font-size: 13.5px;
+  color: var(--ink);
+}
+
+.practiced-date-sub {
+  font-size: 11.5px;
+  color: var(--ink-soft);
+  font-weight: 600;
+}

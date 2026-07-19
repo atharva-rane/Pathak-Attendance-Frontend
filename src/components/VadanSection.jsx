@@ -435,7 +435,7 @@ const VadanSection = ({
         <button className="toolbar-add-btn" onClick={handleAddClick}>
           + Add New Student
         </button>
-        <div className="toolbar-date">Today: {date}</div>
+        <div className="toolbar-date">Date: {date}</div>
       </div>
 
       <div className="search-bar">

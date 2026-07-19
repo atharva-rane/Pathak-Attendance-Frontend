@@ -1,0 +1,59 @@
+/* --- Compact P/A/S buttons for the dense date columns --------------- */
+
+.attendance-btns-compact {
+  gap: 5px;
+}
+
+.att-btn-sm {
+  width: 22px;
+  height: 22px;
+  font-size: 10px;
+}
+
+/* --- Percentage badge ------------------------------------------------ */
+
+.pct-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-weight: 700;
+  font-size: 12.5px;
+}
+
+.pct-high {
+  background: rgba(46, 125, 79, 0.15);
+  color: var(--present-dark);
+}
+
+.pct-mid {
+  background: rgba(201, 138, 18, 0.18);
+  color: var(--seva-dark);
+}
+
+.pct-low {
+  background: rgba(192, 57, 43, 0.15);
+  color: var(--absent-dark);
+}
+
+/* --- Overall section extras ------------------------------------------ */
+
+.overall-scroll-hint {
+  font-size: 12px;
+  color: var(--ink-soft);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.overall-grid-wrapper {
+  overflow-x: auto;
+}
+
+.overall-empty {
+  padding: 28px 16px;
+  text-align: center;
+  color: var(--ink-soft);
+  font-size: 14px;
+  background: white;
+  border: 1.5px dashed var(--border);
+  border-radius: 12px;
+}

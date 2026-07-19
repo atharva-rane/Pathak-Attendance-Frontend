@@ -15,7 +15,7 @@ const Home = () => {
         <p className="home-sub">Open the attendance sheet to view and mark today's Dhol and Tasha students.</p>
 
         <div className="home-grid">
-          <button className="group-card group-card-wide" onClick={() => navigate("/attendance")}>
+          <div className="group-card group-card-wide">
             <div className="group-card-icon" aria-hidden="true">
               <svg width="40" height="40" viewBox="0 0 40 40" fill="none">
                 <ellipse cx="20" cy="9" rx="13" ry="5" fill="white" fillOpacity="0.9" />
@@ -25,8 +25,21 @@ const Home = () => {
             </div>
             <div className="group-card-label">Dhol &amp; Tasha</div>
             <div className="group-card-tagline">Both groups, one attendance sheet</div>
-            <div className="group-card-cta">Mark Attendance →</div>
-          </button>
+
+            <button
+              className="group-card-cta-btn"
+              onClick={() => navigate("/attendance")}
+            >
+              Mark Attendance →
+            </button>
+
+            <button
+              className="group-card-link"
+              onClick={() => navigate("/attendance/overall")}
+            >
+              📊 View Overall Attendance
+            </button>
+          </div>
         </div>
       </main>
     </div>

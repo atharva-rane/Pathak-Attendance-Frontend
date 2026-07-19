@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import * as XLSX from "xlsx";
 import Navbar from "./Navbar.jsx";
 import VadanSection from "./VadanSection.jsx";
@@ -13,9 +13,33 @@ const todayStr = () => {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 };
 
+const isValidDate = (str) => /^\d{4}-\d{2}-\d{2}$/.test(str || "");
+
+const formatDateLong = (dateStr) => {
+  const [y, m, d] = dateStr.split("-").map(Number);
+  const dt = new Date(y, m - 1, d);
+  return dt.toLocaleDateString("en-IN", {
+    weekday: "long",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  });
+};
+
+// Dynamic, per-date attendance sheet. The date comes from the URL
+// (/attendance/2026-07-20) so every date practiced gets its own page.
 const AttendancePage = () => {
   const navigate = useNavigate();
-  const date = useMemo(() => todayStr(), []);
+  const { date: dateParam } = useParams();
+  const today = useMemo(() => todayStr(), []);
+  const date = isValidDate(dateParam) ? dateParam : today;
+
+  // If someone lands on a malformed date in the URL, normalise it.
+  useEffect(() => {
+    if (dateParam && !isValidDate(dateParam)) {
+      navigate(`/attendance/${today}`, { replace: true });
+    }
+  }, [dateParam, today, navigate]);
 
   const [summary, setSummary] = useState(null);
   const [toast, setToast] = useState("");
@@ -56,7 +80,10 @@ const AttendancePage = () => {
 
   return (
     <div className="attendance-page">
-      <Navbar title="Dhol & Tasha — Mark Attendance" onBack={() => navigate("/")} />
+      <Navbar
+        title={`Dhol & Tasha — ${formatDateLong(date)}`}
+        onBack={() => navigate("/attendance")}
+      />
 
       <main className="attendance-main">
         <VadanSection
