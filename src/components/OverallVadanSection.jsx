@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { AgGridReact } from "ag-grid-react";
 import StudentFormModal from "./StudentFormModal.jsx";
 import ConfirmDeleteModal from "./ConfirmDeleteModal.jsx";
+import ConfirmAttendanceUpdateModal from "./ConfirmAttendanceUpdateModal.jsx";
 import api from "../api/axios";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-alpine.css";
@@ -17,35 +18,34 @@ const formatDateShort = (dateStr) => {
 
 // --- Cell renderers -------------------------------------------------
 
-// One date column: same P / A / S buttons as the daily attendance page, just
-// compact. Clicking one posts straight to /api/attendance, so this table and
-// the per-date attendance page always read from the same records.
+// One date column: same P / A / S buttons as the daily attendance page.
+// Because this table holds the official record across every date, marking
+// or changing a status that's already saved requires a double-click plus
+// a confirmation popup — a single click alone can never change it.
 const DateAttendanceCellRenderer = (props) => {
   const { data, context, date } = props;
   const status = data.attendance?.[date];
+  const isSaved = !!status;
+
   return (
     <div className="attendance-btns attendance-btns-compact">
-      <button
-        className={`att-btn att-btn-sm present ${status === "Present" ? "active" : ""}`}
-        onClick={() => context.onMark(data._id, date, "Present")}
-        title="Present"
-      >
-        P
-      </button>
-      <button
-        className={`att-btn att-btn-sm absent ${status === "Absent" ? "active" : ""}`}
-        onClick={() => context.onMark(data._id, date, "Absent")}
-        title="Absent"
-      >
-        A
-      </button>
-      <button
-        className={`att-btn att-btn-sm seva ${status === "Seva" ? "active" : ""}`}
-        onClick={() => context.onMark(data._id, date, "Seva")}
-        title="Absent (Went for Seva)"
-      >
-        S
-      </button>
+      {["Present", "Absent", "Seva"].map((opt) => {
+        const cls = opt === "Present" ? "present" : opt === "Absent" ? "absent" : "seva";
+        const label = opt === "Present" ? "P" : opt === "Absent" ? "A" : "S";
+        return (
+          <button
+            key={opt}
+            className={`att-btn att-btn-sm ${cls} ${status === opt ? "active" : ""}`}
+            onClick={() => context.onQuickMark(data._id, date, opt, data.fullName, isSaved)}
+            onDoubleClick={() =>
+              context.onDoubleMark(data._id, date, opt, data.fullName, isSaved)
+            }
+            title={opt === "Seva" ? "Absent (Went for Seva)" : opt}
+          >
+            {label}
+          </button>
+        );
+      })}
     </div>
   );
 };
@@ -91,12 +91,18 @@ const OverallVadanSection = ({ vadan, onToast, onRowsChange }) => {
   const [deletingStudent, setDeletingStudent] = useState(null);
   const [deleting, setDeleting] = useState(false);
 
+  const [pendingUpdate, setPendingUpdate] = useState(null); // {studentId, date, status, studentName}
+  const [updating, setUpdating] = useState(false);
+
+  const [selectedRowId, setSelectedRowId] = useState(null);
+
   const loadData = useCallback(async () => {
     setLoading(true);
     try {
       const { data } = await api.get("/attendance/overall", { params: { vadan } });
       setDates(data.dates);
       setStudents(data.students);
+      setSelectedRowId(null);
     } catch (err) {
       console.error(err);
       onToast(`Failed to load ${vadan} overall data`);
@@ -109,7 +115,7 @@ const OverallVadanSection = ({ vadan, onToast, onRowsChange }) => {
     loadData();
   }, [loadData]);
 
-  const handleMark = async (studentId, date, status) => {
+  const applyMark = async (studentId, date, status) => {
     // Optimistic update so the P/A/S badge and percentage react instantly.
     setStudents((prev) =>
       prev.map((s) => {
@@ -130,6 +136,35 @@ const OverallVadanSection = ({ vadan, onToast, onRowsChange }) => {
     } catch (err) {
       onToast("Failed to update attendance");
       loadData();
+    }
+  };
+
+  // Single click: only allowed to freely set attendance that hasn't been
+  // marked for that date yet. Changing an already-marked date requires a
+  // double-click and confirmation.
+  const handleQuickMark = (studentId, date, status, studentName, isSaved) => {
+    if (!isSaved) {
+      applyMark(studentId, date, status);
+    }
+    // if already saved, single click is intentionally ignored
+  };
+
+  const handleDoubleMark = (studentId, date, status, studentName, isSaved) => {
+    if (!isSaved) {
+      applyMark(studentId, date, status);
+      return;
+    }
+    setPendingUpdate({ studentId, date, status, studentName });
+  };
+
+  const confirmPendingUpdate = async () => {
+    if (!pendingUpdate) return;
+    setUpdating(true);
+    try {
+      await applyMark(pendingUpdate.studentId, pendingUpdate.date, pendingUpdate.status);
+    } finally {
+      setUpdating(false);
+      setPendingUpdate(null);
     }
   };
 
@@ -302,9 +337,21 @@ const OverallVadanSection = ({ vadan, onToast, onRowsChange }) => {
   const defaultColDef = useMemo(() => ({ resizable: true, sortable: true, filter: true }), []);
 
   const gridContext = useMemo(
-    () => ({ onMark: handleMark, onEdit: handleEdit, onDelete: handleDelete }),
+    () => ({
+      onQuickMark: handleQuickMark,
+      onDoubleMark: handleDoubleMark,
+      onEdit: handleEdit,
+      onDelete: handleDelete,
+    }),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [dates, students],
+  );
+
+  const rowClassRules = useMemo(
+    () => ({
+      "row-selected": (params) => params.data?._id === selectedRowId,
+    }),
+    [selectedRowId],
   );
 
   return (
@@ -347,6 +394,8 @@ const OverallVadanSection = ({ vadan, onToast, onRowsChange }) => {
               animateRows
               loading={loading}
               tooltipShowDelay={200}
+              rowClassRules={rowClassRules}
+              onRowClicked={(params) => setSelectedRowId(params.data?._id ?? null)}
               overlayNoRowsTemplate={`<span>No ${vadan} students yet. Click "Add New Student" to get started.</span>`}
             />
           </div>
@@ -371,6 +420,16 @@ const OverallVadanSection = ({ vadan, onToast, onRowsChange }) => {
           onCancel={() => setDeletingStudent(null)}
           onConfirm={confirmDelete}
           deleting={deleting}
+        />
+      )}
+
+      {pendingUpdate && (
+        <ConfirmAttendanceUpdateModal
+          studentName={pendingUpdate.studentName}
+          status={pendingUpdate.status}
+          busy={updating}
+          onCancel={() => setPendingUpdate(null)}
+          onConfirm={confirmPendingUpdate}
         />
       )}
     </section>

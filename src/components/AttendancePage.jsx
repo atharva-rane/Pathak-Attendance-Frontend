@@ -1,9 +1,16 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import * as XLSX from "xlsx";
 import Navbar from "./Navbar.jsx";
 import VadanSection from "./VadanSection.jsx";
 import SummarySection from "./SummarySection.jsx";
+import UnsavedChangesModal from "./UnsavedChangesModal.jsx";
 import api from "../api/axios";
 import "../styles/AttendancePage.css";
 
@@ -48,6 +55,23 @@ const AttendancePage = () => {
   const dholRowsRef = useRef([]);
   const tashaRowsRef = useRef([]);
 
+  // Refs to the two VadanSection instances so we can force-save their
+  // drafts when the user tries to leave with unsaved attendance.
+  const dholSectionRef = useRef(null);
+  const tashaSectionRef = useRef(null);
+
+  const [dirtyMap, setDirtyMap] = useState({ Dhol: false, Tasha: false });
+  const [showUnsavedModal, setShowUnsavedModal] = useState(false);
+  const [savingBeforeLeave, setSavingBeforeLeave] = useState(false);
+
+  const isDirty = dirtyMap.Dhol || dirtyMap.Tasha;
+  const isDirtyRef = useRef(isDirty);
+  isDirtyRef.current = isDirty;
+
+  const handleDirtyChange = useCallback((vadan, dirty) => {
+    setDirtyMap((prev) => (prev[vadan] === dirty ? prev : { ...prev, [vadan]: dirty }));
+  }, []);
+
   const showToast = useCallback((msg) => {
     setToast(msg);
     setTimeout(() => setToast(""), 2500);
@@ -66,6 +90,74 @@ const AttendancePage = () => {
     refreshSummary();
   }, [refreshSummary]);
 
+  // --- Unsaved-changes guard -------------------------------------------
+
+  // Warn on tab close / refresh while there's an unsaved draft.
+  useEffect(() => {
+    const handler = (e) => {
+      if (!isDirtyRef.current) return;
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, []);
+
+  // Intercept the browser's own back button while dirty. We push one guard
+  // history entry the first time the page becomes dirty (not on every
+  // dirty toggle, so a session that ends up clean again doesn't pick up
+  // extra phantom "no-op" back presses), and swallow pops while dirty.
+  const guardPushedRef = useRef(false);
+  useEffect(() => {
+    if (!isDirty) return;
+    if (!guardPushedRef.current) {
+      window.history.pushState(null, "", window.location.href);
+      guardPushedRef.current = true;
+    }
+    const handlePopState = () => {
+      if (!isDirtyRef.current) return; // let the browser navigate away normally
+      window.history.pushState(null, "", window.location.href);
+      setShowUnsavedModal(true);
+    };
+    window.addEventListener("popstate", handlePopState);
+    return () => window.removeEventListener("popstate", handlePopState);
+  }, [isDirty]);
+
+  const goToDateSelect = useCallback(() => {
+    navigate("/attendance");
+  }, [navigate]);
+
+  const handleBack = () => {
+    if (isDirty) {
+      setShowUnsavedModal(true);
+      return;
+    }
+    goToDateSelect();
+  };
+
+  const handleSaveAndLeave = async () => {
+    setSavingBeforeLeave(true);
+    try {
+      await Promise.all([
+        dholSectionRef.current?.isDirty ? dholSectionRef.current.saveDraft() : null,
+        tashaSectionRef.current?.isDirty ? tashaSectionRef.current.saveDraft() : null,
+      ]);
+      showToast("Attendance saved");
+      setShowUnsavedModal(false);
+      goToDateSelect();
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to save attendance — please try again");
+    } finally {
+      setSavingBeforeLeave(false);
+    }
+  };
+
+  const handleDiscardAndLeave = () => {
+    setShowUnsavedModal(false);
+    goToDateSelect();
+  };
+
   const handleExport = () => {
     const workbook = XLSX.utils.book_new();
 
@@ -82,25 +174,29 @@ const AttendancePage = () => {
     <div className="attendance-page">
       <Navbar
         title={`Dhol & Tasha — ${formatDateLong(date)}`}
-        onBack={() => navigate("/attendance")}
+        onBack={handleBack}
       />
 
       <main className="attendance-main">
         <VadanSection
+          ref={dholSectionRef}
           vadan="Dhol"
           date={date}
           onAttendanceChanged={refreshSummary}
           onToast={showToast}
+          onDirtyChange={handleDirtyChange}
           onRowsChange={(rows) => {
             dholRowsRef.current = rows;
           }}
         />
 
         <VadanSection
+          ref={tashaSectionRef}
           vadan="Tasha"
           date={date}
           onAttendanceChanged={refreshSummary}
           onToast={showToast}
+          onDirtyChange={handleDirtyChange}
           onRowsChange={(rows) => {
             tashaRowsRef.current = rows;
           }}
@@ -116,6 +212,15 @@ const AttendancePage = () => {
       </main>
 
       {toast && <div className="toast">{toast}</div>}
+
+      {showUnsavedModal && (
+        <UnsavedChangesModal
+          saving={savingBeforeLeave}
+          onCancel={() => setShowUnsavedModal(false)}
+          onDiscard={handleDiscardAndLeave}
+          onSave={handleSaveAndLeave}
+        />
+      )}
     </div>
   );
 };

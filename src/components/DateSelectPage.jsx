@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "./Navbar.jsx";
+import ConfirmTextModal from "./ConfirmTextModal.jsx";
 import api from "../api/axios";
 import "../styles/DateSelectPage.css";
 
@@ -35,6 +36,15 @@ const DateSelectPage = () => {
   const [selectedDate, setSelectedDate] = useState(today);
   const [practicedDates, setPracticedDates] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [toast, setToast] = useState("");
+
+  const [deletingDate, setDeletingDate] = useState(null);
+  const [deleting, setDeleting] = useState(false);
+
+  const showToast = useCallback((msg) => {
+    setToast(msg);
+    setTimeout(() => setToast(""), 2500);
+  }, []);
 
   const loadDates = useCallback(async () => {
     setLoading(true);
@@ -55,6 +65,27 @@ const DateSelectPage = () => {
   const openDate = (date) => {
     if (!date) return;
     navigate(`/attendance/${date}`);
+  };
+
+  const handleDeleteClick = (e, date) => {
+    e.stopPropagation();
+    setDeletingDate(date);
+  };
+
+  const confirmDeleteDate = async () => {
+    if (!deletingDate) return;
+    setDeleting(true);
+    try {
+      await api.delete(`/attendance/date/${deletingDate}`);
+      showToast(`Attendance for ${deletingDate} deleted`);
+      setDeletingDate(null);
+      loadDates();
+    } catch (err) {
+      console.error(err);
+      showToast("Failed to delete attendance record");
+    } finally {
+      setDeleting(false);
+    }
   };
 
   return (
@@ -102,22 +133,48 @@ const DateSelectPage = () => {
           ) : (
             <div className="practiced-dates-grid">
               {practicedDates.map((date) => (
-                <button
+                <div
                   key={date}
                   className={`practiced-date-chip ${date === today ? "is-today" : ""}`}
                   onClick={() => openDate(date)}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter") openDate(date);
+                  }}
                 >
+                  <button
+                    className="practiced-date-delete"
+                    title="Delete this attendance record"
+                    onClick={(e) => handleDeleteClick(e, date)}
+                  >
+                    🗑
+                  </button>
                   <span className="practiced-date-main">{formatDateLong(date)}</span>
                   <span className="practiced-date-sub">
                     {date}
                     {date === today ? " · Today" : ""}
                   </span>
-                </button>
+                </div>
               ))}
             </div>
           )}
         </section>
       </main>
+
+      {deletingDate && (
+        <ConfirmTextModal
+          title="Delete Attendance Record"
+          message={`This will permanently delete the attendance for both Dhol and Tasha on ${formatDateLong(deletingDate)}. This cannot be undone.`}
+          confirmValue={deletingDate}
+          confirmLabel="Delete Record"
+          busy={deleting}
+          onCancel={() => setDeletingDate(null)}
+          onConfirm={confirmDeleteDate}
+        />
+      )}
+
+      {toast && <div className="toast">{toast}</div>}
     </div>
   );
 };
